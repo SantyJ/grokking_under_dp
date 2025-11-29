@@ -1,0 +1,21 @@
+/home/sj1230/miniconda/envs/grokking/lib/python3.10/site-packages/opacus/privacy_engine.py:96: UserWarning: Secure RNG turned off. This is perfectly fine for experimentation as it allows for much faster training performance, but remember to turn it on and retrain one last time before production with ``secure_mode`` turned on.
+  warnings.warn(
+/home/sj1230/miniconda/envs/grokking/lib/python3.10/site-packages/opacus/accountants/analysis/rdp.py:332: UserWarning: Optimal order is the largest alpha. Please consider expanding the range of alphas to get a tighter privacy bound.
+  warnings.warn(
+Using device: cuda:0
+Starting training. Train dataset size: 5107, Test size: 7662
+Using AlgorithmicDataset
+cross_entropy
+Epoch 0: Epsilon: 0.02
+Epoch 0: Training loss: 4.7266
+Epoch 500: Epsilon: 0.46
+Epoch 500: Training loss: 4.7188
+Time taken for the last 500 epochs: 1.53 min
+Epoch 1000: Epsilon: 0.68
+Epoch 1000: Training loss: 4.7305
+Time taken for the last 500 epochs: 1.52 min
+Epoch 1500: Epsilon: 0.85
+Epoch 1500: Training loss: 4.7227
+Time taken for the last 500 epochs: 1.52 min
+Test set: Average loss: 4.8186, Accuracy: 0.68
+Saving run: add_mod|num_epochs-2000|train_fraction-0.4|log_frequency-500|lr-0.0005|cross_entropy_dtype-float16|adam_epsilon-1e-30|use_dp-True|target_epsilon-1.0|target_delta-0.00019580967299784609
