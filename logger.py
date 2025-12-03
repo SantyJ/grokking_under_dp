@@ -21,6 +21,10 @@ class MetricsLogger:
             "loss": self.compute_loss,
             "accuracy": self.compute_accuracy,
             "weights_l2": self.compute_weights_l2,
+            "grad_l2_norm": self.compute_grad_l2_norm,
+            "grad_cosine_similarity": self.compute_grad_cosine_similarity,
+            "abs_grad_l1_norm": self.compute_abs_grad_l1_norm,
+            "zero_grad_percentage": self.compute_zero_grad_percentage,
             "zero_terms": self.compute_zero_terms,
             "softmax_collapse": self.compute_softmax_collapse,
         }
@@ -41,8 +45,13 @@ class MetricsLogger:
     def _run_full_batch_forward(self, model, data, targets, args):
         model.eval()
         device = next(model.parameters()).device
-        data = data.to(device)
-        targets = targets.to(device)
+        if isinstance(data, torch.Tensor):
+            data = data.to(device)
+            targets = targets.to(device)
+        else: # Handle dataloaders
+            data = data.dataset.dataset.data[data.dataset.indices].to(device)
+            targets = data.dataset.dataset.targets[data.dataset.indices].to(device)
+            
         with torch.no_grad():
             output = model(data)
             if args.use_transformer:
@@ -51,9 +60,9 @@ class MetricsLogger:
 
     def log_metrics(self, model, epoch, save_model_checkpoints, saved_models,
                     all_data, all_targets, all_test_data, all_test_targets,
-                    args, loss_function):
+                    args, loss_function, full_batch=True, train_loader=None, test_loader=None):
         """
-        Compute and log all metrics in a full-batch setting.
+        Compute and log all metrics.
         """
 
         epoch_position = self._get_epoch_position(epoch)
@@ -61,9 +70,26 @@ class MetricsLogger:
         if epoch in save_model_checkpoints:
             saved_models[epoch] = copy.deepcopy(model.state_dict())
 
+        if full_batch:
+            self._train_output, self._train_targets = self._run_full_batch_forward(model, all_data, all_targets, args)
+            self._test_output, self._test_targets = self._run_full_batch_forward(model, all_test_data, all_test_targets, args)
+        else:
+            # This is slow, but necessary for mini-batch logging.
+            train_outputs, train_targets = [], []
+            for data, target, *_ in train_loader:
+                output, target = self._run_full_batch_forward(model, data, target, args)
+                train_outputs.append(output)
+                train_targets.append(target)
+            self._train_output = torch.cat(train_outputs)
+            self._train_targets = torch.cat(train_targets)
 
-        self._train_output, self._train_targets = self._run_full_batch_forward(model, all_data, all_targets, args)
-        self._test_output, self._test_targets = self._run_full_batch_forward(model, all_test_data, all_test_targets, args)
+            test_outputs, test_targets = [], []
+            for data, target, *_ in test_loader:
+                output, target = self._run_full_batch_forward(model, data, target, args)
+                test_outputs.append(output)
+                test_targets.append(target)
+            self._test_output = torch.cat(test_outputs)
+            self._test_targets = torch.cat(test_targets)
 
 
         for metric_name, metric_fn in self.metric_fns.items():
@@ -171,3 +197,65 @@ class MetricsLogger:
             "layer": None,
             "value": softmax_collapse
         }]
+
+    def compute_grad_l2_norm(self, model, epoch, epoch_position, args, loss_function):
+        results = []
+        for name, param in model.named_parameters():
+            if param.grad is not None:
+                val = param.grad.square().sum().sqrt().item()
+                results.append({
+                    "epoch": epoch_position,
+                    "input_type": "general",
+                    "metric_name": "grad_l2_norm",
+                    "layer": name,
+                    "value": val
+                })
+        return results
+
+    def compute_grad_cosine_similarity(self, model, epoch, epoch_position, args, loss_function):
+        results = []
+        for name, param in model.named_parameters():
+            if param.grad is not None:
+                grad_norm = param.grad.square().sum().sqrt()
+                weight_norm = param.square().sum().sqrt()
+                if grad_norm > 0 and weight_norm > 0:
+                    val = (param * param.grad).sum() / (grad_norm * weight_norm)
+                    val = val.item()
+                else:
+                    val = 0
+                results.append({
+                    "epoch": epoch_position,
+                    "input_type": "general",
+                    "metric_name": "grad_cosine_similarity",
+                    "layer": name,
+                    "value": val
+                })
+        return results
+
+    def compute_abs_grad_l1_norm(self, model, epoch, epoch_position, args, loss_function):
+        results = []
+        for name, param in model.named_parameters():
+            if param.grad is not None:
+                val = param.grad.abs().sum().item()
+                results.append({
+                    "epoch": epoch_position,
+                    "input_type": "general",
+                    "metric_name": "abs_grad_l1_norm",
+                    "layer": name,
+                    "value": val
+                })
+        return results
+    
+    def compute_zero_grad_percentage(self, model, epoch, epoch_position, args, loss_function):
+        results = []
+        for name, param in model.named_parameters():
+            if param.grad is not None:
+                val = (param.grad == 0).float().mean().item()
+                results.append({
+                    "epoch": epoch_position,
+                    "input_type": "general",
+                    "metric_name": "zero_grad_percentage",
+                    "layer": name,
+                    "value": val
+                })
+        return results

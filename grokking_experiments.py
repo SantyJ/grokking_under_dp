@@ -90,6 +90,14 @@ for epoch in range(args.num_epochs):
     optimizer.step()
 
     if epoch % logger.log_frequency == 0:
+        model.train()
+        optimizer.zero_grad()
+        output = model(shuffled_data)
+        if args.use_transformer:
+            output = output[:, -1]
+        output = output*args.alpha
+        loss_for_logging = loss_function(output, shuffled_targets, dtype=ce_dtype)
+        loss_for_logging.backward()
         logger.log_metrics(
             model=model,
             epoch=epoch,
@@ -102,6 +110,7 @@ for epoch in range(args.num_epochs):
             args=args,
             loss_function=loss_function,
         )
+        optimizer.zero_grad()
 
         print(f'Epoch {epoch}: Training loss: {loss.item():.4f}')
         if epoch > 0:

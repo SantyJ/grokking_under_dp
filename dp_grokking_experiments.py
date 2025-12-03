@@ -144,9 +144,39 @@ for epoch in range(args.num_epochs):
                 loss_function=loss_function,
             )
         else:
-            # Logging for mini-batch will require iterating through the dataset, which can be slow.
-            # For now, just printing the loss of the last batch.
-            pass
+            model.train()
+            optimizer.zero_grad()
+            # To compute gradients for logging, we need to do a forward and backward pass.
+            # We'll use the first batch of the train loader for this.
+            data, target, *_ = next(iter(train_loader))
+            data, target = data.to(device), target.to(device).long()
+            if not (args.use_transformer or args.use_embedding):
+                data = data.to(train_dtype)
+            
+            output = model(data)
+            if args.use_transformer:
+                output = output[:, -1]
+            output = output * args.alpha
+            loss_for_logging = loss_function(output, target, dtype=ce_dtype)
+            loss_for_logging.backward()
+
+            # Note: This will be slow as it iterates through the whole dataset
+            logger.log_metrics(
+                model=model,
+                epoch=epoch,
+                save_model_checkpoints=save_model_checkpoints,
+                saved_models=saved_models,
+                all_data=train_loader.dataset,
+                all_targets=None, # Targets are part of the dataset in this case
+                all_test_data=test_loader.dataset,
+                all_test_targets=None, # Targets are part of the dataset in this case
+                args=args,
+                loss_function=loss_function,
+                full_batch=False,
+                train_loader=train_loader,
+                test_loader=test_loader
+            )
+            optimizer.zero_grad()
 
 
         print(f'Epoch {epoch}: Training loss: {loss.item():.4f}')
