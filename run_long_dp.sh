@@ -7,6 +7,6 @@ python3 dp_grokking_experiments.py \
 --lr=5e-4 \
 --adam_epsilon=1e-30 \
 --cross_entropy_dtype="float16" \
---use_dp=True \
+--use_dp \
 --target_epsilon=1.0
 
