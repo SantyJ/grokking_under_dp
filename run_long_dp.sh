@@ -8,5 +8,6 @@ python3 dp_grokking_experiments.py \
 --adam_epsilon=1e-30 \
 --cross_entropy_dtype="float16" \
 --use_dp \
---target_epsilon=1.0
+--target_epsilon=1.0 \
+--max_grad_norm 1.0
 
