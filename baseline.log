@@ -1,0 +1,47 @@
+Using device: cuda:0
+Starting training. Train dataset size: 5107, Test size: 7662
+Using AlgorithmicDataset
+cross_entropy
+/workspace/grokking_under_dp/logger.py:102: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  self.metrics_df = pd.concat([self.metrics_df, pd.DataFrame(rows)], ignore_index=True)
+Epoch 0: Training loss: 4.7266
+Epoch 500: Training loss: 0.2094
+Time taken for the last 500 epochs: 0.01 min
+Epoch 1000: Training loss: 0.0035
+Time taken for the last 500 epochs: 0.01 min
+Epoch 1500: Training loss: 0.0027
+Time taken for the last 500 epochs: 0.01 min
+Epoch 2000: Training loss: 0.0076
+Time taken for the last 500 epochs: 0.01 min
+Epoch 2500: Training loss: 0.0080
+Time taken for the last 500 epochs: 0.01 min
+Epoch 3000: Training loss: 0.0325
+Time taken for the last 500 epochs: 0.01 min
+Epoch 3500: Training loss: 0.0035
+Time taken for the last 500 epochs: 0.01 min
+Epoch 4000: Training loss: 0.0024
+Time taken for the last 500 epochs: 0.01 min
+Epoch 4500: Training loss: 0.0013
+Time taken for the last 500 epochs: 0.01 min
+Epoch 5000: Training loss: 0.0012
+Time taken for the last 500 epochs: 0.01 min
+Epoch 5500: Training loss: 0.0011
+Time taken for the last 500 epochs: 0.01 min
+Epoch 6000: Training loss: 0.0014
+Time taken for the last 500 epochs: 0.01 min
+Epoch 6500: Training loss: 0.0017
+Time taken for the last 500 epochs: 0.01 min
+Epoch 7000: Training loss: 0.0009
+Time taken for the last 500 epochs: 0.01 min
+Epoch 7500: Training loss: 0.0007
+Time taken for the last 500 epochs: 0.01 min
+Epoch 8000: Training loss: 0.0007
+Time taken for the last 500 epochs: 0.01 min
+Epoch 8500: Training loss: 1.2051
+Time taken for the last 500 epochs: 0.01 min
+Epoch 9000: Training loss: 0.0005
+Time taken for the last 500 epochs: 0.01 min
+Epoch 9500: Training loss: 0.0004
+Time taken for the last 500 epochs: 0.01 min
+Test set: Average loss: 55.8320, Accuracy: 0.03
+Saving run: add_mod|num_epochs-10000|train_fraction-0.4|log_frequency-500|lr-0.0005|batch_size-5107|cross_entropy_dtype-float16|adam_epsilon-1e-30

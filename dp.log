@@ -1,0 +1,71 @@
+Using device: cuda:0
+Starting training. Train dataset size: 5107, Test size: 7662
+Using AlgorithmicDataset
+/venv/grokking/lib/python3.11/site-packages/opacus/privacy_engine.py:96: UserWarning: Secure RNG turned off. This is perfectly fine for experimentation as it allows for much faster training performance, but remember to turn it on and retrain one last time before production with ``secure_mode`` turned on.
+  warnings.warn(
+/venv/grokking/lib/python3.11/site-packages/opacus/accountants/analysis/rdp.py:332: UserWarning: Optimal order is the largest alpha. Please consider expanding the range of alphas to get a tighter privacy bound.
+  warnings.warn(
+cross_entropy
+Epoch 0: Epsilon: 0.01
+/workspace/grokking_under_dp/logger.py:102: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  self.metrics_df = pd.concat([self.metrics_df, pd.DataFrame(rows)], ignore_index=True)
+Epoch 0: Training loss: 4.7266
+Epoch 500: Epsilon: 0.19
+Epoch 500: Training loss: 4.7188
+Time taken for the last 500 epochs: 0.92 min
+Epoch 1000: Epsilon: 0.28
+Epoch 1000: Training loss: 4.7227
+Time taken for the last 500 epochs: 1.21 min
+Epoch 1500: Epsilon: 0.35
+Epoch 1500: Training loss: 4.7656
+Time taken for the last 500 epochs: 1.68 min
+Epoch 2000: Epsilon: 0.41
+Epoch 2000: Training loss: 4.7266
+Time taken for the last 500 epochs: 1.78 min
+Epoch 2500: Epsilon: 0.46
+Epoch 2500: Training loss: 4.8086
+Time taken for the last 500 epochs: 1.07 min
+Epoch 3000: Epsilon: 0.51
+Epoch 3000: Training loss: 4.8125
+Time taken for the last 500 epochs: 1.05 min
+Epoch 3500: Epsilon: 0.55
+Epoch 3500: Training loss: 4.8359
+Time taken for the last 500 epochs: 0.93 min
+Epoch 4000: Epsilon: 0.60
+Epoch 4000: Training loss: 4.9688
+Time taken for the last 500 epochs: 0.92 min
+Epoch 4500: Epsilon: 0.64
+Epoch 4500: Training loss: 5.0000
+Time taken for the last 500 epochs: 1.72 min
+Epoch 5000: Epsilon: 0.68
+Epoch 5000: Training loss: 5.1016
+Time taken for the last 500 epochs: 0.93 min
+Epoch 5500: Epsilon: 0.71
+Epoch 5500: Training loss: 5.2539
+Time taken for the last 500 epochs: 1.29 min
+Epoch 6000: Epsilon: 0.75
+Epoch 6000: Training loss: 5.2930
+Time taken for the last 500 epochs: 1.35 min
+Epoch 6500: Epsilon: 0.78
+Epoch 6500: Training loss: 5.3086
+Time taken for the last 500 epochs: 0.92 min
+Epoch 7000: Epsilon: 0.82
+Epoch 7000: Training loss: 5.3984
+Time taken for the last 500 epochs: 0.92 min
+Epoch 7500: Epsilon: 0.85
+Epoch 7500: Training loss: 5.5625
+Time taken for the last 500 epochs: 1.28 min
+Epoch 8000: Epsilon: 0.88
+Epoch 8000: Training loss: 5.6328
+Time taken for the last 500 epochs: 1.39 min
+Epoch 8500: Epsilon: 0.91
+Epoch 8500: Training loss: 5.4688
+Time taken for the last 500 epochs: 0.93 min
+Epoch 9000: Epsilon: 0.94
+Epoch 9000: Training loss: 5.6094
+Time taken for the last 500 epochs: 0.95 min
+Epoch 9500: Epsilon: 0.97
+Epoch 9500: Training loss: 5.5938
+Time taken for the last 500 epochs: 0.94 min
+Test set: Average loss: 6.0549, Accuracy: 0.89
+Saving run: add_mod|num_epochs-10000|train_fraction-0.4|log_frequency-500|lr-0.0005|cross_entropy_dtype-float16|adam_epsilon-1e-30|use_dp-True|target_epsilon-1.0|target_delta-0.00019580967299784609
