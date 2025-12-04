@@ -48,8 +48,8 @@ def get_total_zero_grad_percentage(df):
 
 def generate_plots():
     """Generates and saves the comparison plot."""
-    baseline_experiment_key = "add_mod|num_epochs-2000|train_fraction-0.4|log_frequency-500|lr-0.0005|batch_size-5107|cross_entropy_dtype-float16|adam_epsilon-1e-30"
-    dp_experiment_key = "add_mod|num_epochs-2000|train_fraction-0.4|log_frequency-500|lr-0.0005|cross_entropy_dtype-float16|adam_epsilon-1e-30|use_dp-True|target_epsilon-1.0|target_delta-0.00019580967299784609"
+    baseline_experiment_key = "add_mod|num_epochs-10000|train_fraction-0.4|log_frequency-500|lr-0.0005|batch_size-5107|cross_entropy_dtype-float16|adam_epsilon-1e-30"
+    dp_experiment_key = "add_mod|num_epochs-10000|train_fraction-0.4|log_frequency-500|lr-0.0005|cross_entropy_dtype-float16|adam_epsilon-1e-30|use_dp-True|target_epsilon-1.0|target_delta-0.00019580967299784609"
 
     try:
         baseline_metrics = pd.read_csv(f"loggs/{baseline_experiment_key}/metrics.csv")
