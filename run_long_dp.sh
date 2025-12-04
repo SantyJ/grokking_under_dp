@@ -1,6 +1,11 @@
 #!/bin/bash
+
+DEVICE="cuda:0"
+
 python3 dp_grokking_experiments.py \
+--device "$DEVICE" \
 --binary_operation="add_mod" \
+
 --num_epochs=10000 \
 --train_fraction=0.4 \
 --log_frequency=500 \
