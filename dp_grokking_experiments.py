@@ -61,6 +61,7 @@ if args.use_dp:
         target_delta=args.target_delta,
         epochs=args.num_epochs,
     )
+    print(f"Using target_epsilon: {args.target_epsilon}")
 
 
 print(args.loss_function)
