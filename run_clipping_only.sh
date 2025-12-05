@@ -2,7 +2,7 @@
 
 DEVICE="cuda:0"
 
-python3 clipping_only_experiments.py \
+python3 -u clipping_only_experiments.py \
     --device "$DEVICE" \
     --binary_operation="add_mod" \
     --num_epochs=20000 \
