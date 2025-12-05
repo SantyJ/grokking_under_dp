@@ -21,6 +21,9 @@ torch.set_num_threads(5)
 
 parser, args = parse_args()
 
+print("Running experiment with the following parameters:")
+print(json.dumps(vars(args), indent=4))
+
 random.seed(args.seed)
 torch.manual_seed(args.seed)
 
