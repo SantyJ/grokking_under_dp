@@ -36,6 +36,22 @@ class MetricsLogger:
         self._test_output = None
         self._test_targets = None
 
+    def _run_full_batch_forward(self, model, data, targets, args):
+        model.eval()
+        device = next(model.parameters()).device
+        if isinstance(data, torch.Tensor):
+            data = data.to(device)
+            targets = targets.to(device)
+        else: # Handle dataloaders
+            data = data.dataset.dataset.data[data.dataset.indices].to(device)
+            targets = data.dataset.dataset.targets[data.dataset.indices].to(device)
+            
+        with torch.no_grad():
+            output = model(data)
+            if args.use_transformer:
+                output = output[:,-1]
+        return output, targets
+
     def log_metrics(self, model, epoch, save_model_checkpoints, saved_models,
                     all_data, all_targets, all_test_data, all_test_targets,
                     args, loss_function, full_batch=True, train_loader=None, test_loader=None):
