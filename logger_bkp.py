@@ -36,12 +36,36 @@ class MetricsLogger:
         self._test_output = None
         self._test_targets = None
 
+    def _get_epoch_position(self, epoch: int) -> int:
+        epoch_position = epoch // self.log_frequency
+        if epoch > self.num_early_training_epochs:
+            epoch_position += self.num_early_training_epochs // self.early_training_log_frequency
+        return epoch_position
+
+    def _run_full_batch_forward(self, model, data, targets, args):
+        model.eval()
+        device = next(model.parameters()).device
+        if isinstance(data, torch.Tensor):
+            data = data.to(device)
+            targets = targets.to(device)
+        else: # Handle dataloaders
+            data = data.dataset.dataset.data[data.dataset.indices].to(device)
+            targets = data.dataset.dataset.targets[data.dataset.indices].to(device)
+            
+        with torch.no_grad():
+            output = model(data)
+            if args.use_transformer:
+                output = output[:,-1]
+        return output, targets
+
     def log_metrics(self, model, epoch, save_model_checkpoints, saved_models,
                     all_data, all_targets, all_test_data, all_test_targets,
                     args, loss_function, full_batch=True, train_loader=None, test_loader=None):
         """
         Compute and log all metrics.
         """
+
+        epoch_position = self._get_epoch_position(epoch)
 
         if epoch in save_model_checkpoints:
             saved_models[epoch] = copy.deepcopy(model.state_dict())
@@ -71,6 +95,7 @@ class MetricsLogger:
         for metric_name, metric_fn in self.metric_fns.items():
             rows = metric_fn(model=model,
                              epoch=epoch,
+                             epoch_position=epoch_position,
                              args=args,
                              loss_function=loss_function)
             if rows is not None and len(rows) > 0:
@@ -83,21 +108,21 @@ class MetricsLogger:
         self._test_targets = None
 
 
-    def compute_loss(self, model, epoch, args, loss_function):
+    def compute_loss(self, model, epoch, epoch_position, args, loss_function):
         ce_dtype = getattr(torch, args.cross_entropy_dtype)
         train_loss_val = loss_function(self._train_output, self._train_targets, dtype=ce_dtype).item()
         test_loss_val = loss_function(self._test_output, self._test_targets, dtype=ce_dtype).item()
 
         return [
             {
-                "epoch": epoch,
+                "epoch": epoch_position,
                 "input_type": "train",
                 "metric_name": "loss",
                 "layer": None,
                 "value": train_loss_val
             },
             {
-                "epoch": epoch,
+                "epoch": epoch_position,
                 "input_type": "test",
                 "metric_name": "loss",
                 "layer": None,
@@ -105,7 +130,7 @@ class MetricsLogger:
             }
         ]
 
-    def compute_accuracy(self, model, epoch, args, loss_function):
+    def compute_accuracy(self, model, epoch, epoch_position, args, loss_function):
         train_preds = self._train_output.argmax(dim=1)
         test_preds = self._test_output.argmax(dim=1)
 
@@ -116,14 +141,14 @@ class MetricsLogger:
 
         return [
             {
-                "epoch": epoch,
+                "epoch": epoch_position,
                 "input_type": "train",
                 "metric_name": "accuracy",
                 "layer": None,
                 "value": train_acc
             },
             {
-                "epoch": epoch,
+                "epoch": epoch_position,
                 "input_type": "test",
                 "metric_name": "accuracy",
                 "layer": None,
@@ -131,12 +156,12 @@ class MetricsLogger:
             }
         ]
 
-    def compute_weights_l2(self, model, epoch, args, loss_function):
+    def compute_weights_l2(self, model, epoch, epoch_position, args, loss_function):
         results = []
         for name, param in model.named_parameters():
             val = param.square().sum().sqrt().item()
             results.append({
-                "epoch": epoch,
+                "epoch": epoch_position,
                 "input_type": "general",
                 "metric_name": "weights_l2",
                 "layer": name,
@@ -144,19 +169,19 @@ class MetricsLogger:
             })
         return results
 
-    def compute_zero_terms(self, model, epoch, args, loss_function):
+    def compute_zero_terms(self, model, epoch, epoch_position, args, loss_function):
         ce_dtype = getattr(torch, args.cross_entropy_dtype)
         full_loss = loss_function(self._train_output, self._train_targets, reduction="none", dtype=ce_dtype)
         zero_val = ((full_loss == 0).sum().item() / (full_loss.shape[0]))
         return [{
-            "epoch": epoch,
+            "epoch": epoch_position,
             "input_type": "train",
             "metric_name": "zero_terms",
             "layer": None,
             "value": zero_val
         }]
 
-    def compute_softmax_collapse(self, model, epoch, args, loss_function):
+    def compute_softmax_collapse(self, model, epoch, epoch_position, args, loss_function):
         ce_dtype = getattr(torch, args.cross_entropy_dtype)
         output = self._train_output.to(ce_dtype)
         output_off = output - output.amax(dim=1, keepdim=True)
@@ -166,20 +191,20 @@ class MetricsLogger:
         softmax_collapse = (sum_exp==1).float().mean().item()
 
         return [{
-            "epoch": epoch,
+            "epoch": epoch_position,
             "input_type": "train",
             "metric_name": "softmax_collapse",
             "layer": None,
             "value": softmax_collapse
         }]
 
-    def compute_grad_l2_norm(self, model, epoch, args, loss_function):
+    def compute_grad_l2_norm(self, model, epoch, epoch_position, args, loss_function):
         results = []
         for name, param in model.named_parameters():
             if param.grad is not None:
                 val = param.grad.square().sum().sqrt().item()
                 results.append({
-                    "epoch": epoch,
+                    "epoch": epoch_position,
                     "input_type": "general",
                     "metric_name": "grad_l2_norm",
                     "layer": name,
@@ -187,7 +212,7 @@ class MetricsLogger:
                 })
         return results
 
-    def compute_grad_cosine_similarity(self, model, epoch, args, loss_function):
+    def compute_grad_cosine_similarity(self, model, epoch, epoch_position, args, loss_function):
         results = []
         for name, param in model.named_parameters():
             if param.grad is not None:
@@ -199,7 +224,7 @@ class MetricsLogger:
                 else:
                     val = 0
                 results.append({
-                    "epoch": epoch,
+                    "epoch": epoch_position,
                     "input_type": "general",
                     "metric_name": "grad_cosine_similarity",
                     "layer": name,
@@ -207,13 +232,13 @@ class MetricsLogger:
                 })
         return results
 
-    def compute_abs_grad_l1_norm(self, model, epoch, args, loss_function):
+    def compute_abs_grad_l1_norm(self, model, epoch, epoch_position, args, loss_function):
         results = []
         for name, param in model.named_parameters():
             if param.grad is not None:
                 val = param.grad.abs().sum().item()
                 results.append({
-                    "epoch": epoch,
+                    "epoch": epoch_position,
                     "input_type": "general",
                     "metric_name": "abs_grad_l1_norm",
                     "layer": name,
@@ -221,13 +246,13 @@ class MetricsLogger:
                 })
         return results
     
-    def compute_zero_grad_percentage(self, model, epoch, args, loss_function):
+    def compute_zero_grad_percentage(self, model, epoch, epoch_position, args, loss_function):
         results = []
         for name, param in model.named_parameters():
             if param.grad is not None:
                 val = (param.grad == 0).float().mean().item()
                 results.append({
-                    "epoch": epoch,
+                    "epoch": epoch_position,
                     "input_type": "general",
                     "metric_name": "zero_grad_percentage",
                     "layer": name,
