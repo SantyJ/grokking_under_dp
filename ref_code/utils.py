@@ -281,19 +281,9 @@ def parse_args():
                         help='Device')
     parser.add_argument('--beta2', type=float, default=0.99,
                         help='Beta2 parameter for Adam and AdamW')
-    parser.add_argument('--adam_epsilon', type=float, default=1e-8,
+    parser.add_argument('--adam_epsilon', type=float, default=1e-25,
                         help='Epsilon value for Adam and AdamW')
     parser.add_argument('--seed', type=int, default=42,
                         help='Random seed. Default is 42.')
-
-    # DP arguments
-    parser.add_argument('--use_dp', action='store_true', default=False,
-                        help='Use Differential Privacy. Default is False.')
-    parser.add_argument('--target_epsilon', type=float, default=5.0,
-                        help='Target epsilon for DP. Default is 5.0.')
-    parser.add_argument('--max_grad_norm', type=float, default=1.0,
-                        help='Max grad norm for DP. Default is 1.0.')
-    parser.add_argument('--target_delta', type=float, default=None,
-                        help='Target delta for DP. Default is None, which will set it to 1/len(train_dataset).')
 
     return parser, parser.parse_args()

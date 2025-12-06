@@ -281,7 +281,7 @@ def parse_args():
                         help='Device')
     parser.add_argument('--beta2', type=float, default=0.99,
                         help='Beta2 parameter for Adam and AdamW')
-    parser.add_argument('--adam_epsilon', type=float, default=1e-25,
+    parser.add_argument('--adam_epsilon', type=float, default=1e-8,
                         help='Epsilon value for Adam and AdamW')
     parser.add_argument('--seed', type=int, default=42,
                         help='Random seed. Default is 42.')
