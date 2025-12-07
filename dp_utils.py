@@ -285,6 +285,10 @@ def parse_args():
                         help='Epsilon value for Adam and AdamW')
     parser.add_argument('--seed', type=int, default=42,
                         help='Random seed. Default is 42.')
+    parser.add_argument('--label_smoothing', type=float, default=0.0,
+                        help='Label smoothing for cross entropy. Default is 0.0 (no smoothing).')
+    parser.add_argument('--logit_normalize', action='store_true', default=False,
+                        help='L2-normalize logits before softmax to stabilize scale. Default is False.')
 
     # DP arguments
     parser.add_argument('--use_dp', action='store_true', default=False,
