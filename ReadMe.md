@@ -37,7 +37,7 @@ To replicate the main figures from our paper, use the `run_main_experiments.sh` 
 ./run_main_experiments.sh [--figures FIGURE_LIST] [--device DEVICE]
 ```
 
-## Requirements
+## Requirements :
 
 1. **Install PyTorch:**
    
