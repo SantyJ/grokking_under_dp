@@ -22,10 +22,6 @@ We replace traditional weight decay ($\lambda$) with a privacy budget ($\epsilon
 ### 1. Environment Configuration
 We recommend using Python 3.10 and Conda for isolation:
 
-## Results
-
-For a full breakdown of experimental results, performance metrics, and our final analysis, please refer to the [`Report`](./Topics_in_FDTNS_Project_Report_sj1230_hr458.pdf)
-
 ```bash
 # Create and activate environment
 conda create -n grokking-dp python=3.10 -y
@@ -33,3 +29,10 @@ conda activate grokking-dp
 
 # Install PyTorch with CUDA 12.1 support
 conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia
+```
+
+## Results
+
+For a full breakdown of experimental results, performance metrics, and our final analysis, please refer to the [`Report`](./Topics_in_FDTNS_Project_Report_sj1230_hr458.pdf)
+
+
