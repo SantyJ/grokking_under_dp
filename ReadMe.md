@@ -1,66 +1,35 @@
+# Grokking Under Differential Privacy
+
 <p align="center">
-
-  <h1 align="center"><a href="">Grokking at the Edge of Numerical Stability</a></h1>
-  <p align="center">
-    <a href="https://safeandtrustedai.org/person/lucas-prieto/"><strong>Lucas Prieto</strong></a>
-    ·
-    <a href="https://scholar.google.com.tr/citations?user=cmDBJlEAAAAJ&hl=en"><strong>Melih Barsbey</strong></a>
-    ·
-    <a href="https://pmediano.gitlab.io"><strong>Pedro Mediano</strong></a><sup>*</sup>
-    ·
-    <a href="https://tolgabirdal.github.io/"><strong>Tolga Birdal</strong></a><sup>*</sup>
-  </p>
-  <p align="center">
-    <strong>Imperial College London</strong></a>
-  </p>
-  <p align="center">
-    <strong>Under Review</strong></a>
-  </p>
-  <div align="center">
-    <img src="./teaser.png" alt="Logo" width="100%">
-  </div>
-
+  <img src="./teaser.png" alt="Grokking and Stability" width="100%">
 </p>
 
+This repository is the official implementation for our research project: **"Grokking Under Differential Privacy."** This work is built upon the ICLR 2025 paper [**Grokking at the Edge of Numerical Stability**](https://arxiv.org/abs/2501.04697) by Prieto et al.
 
-<br/>
-This is the official implementation of our paper <a href="https://arxiv.org/abs/2501.04697" target="_blank"><i>Grokking at the Edge of Numerical Stability</i></a> (arXiv: 2501.04697). Here you can find guidance to reproduce the main results of the paper.
-<br/>
+## 🔬 Research Overview
 
-## Replicating Our Results
+The original paper demonstrates that without regularization, models fail to grok because they enter a state of **Naïve Loss Minimization (NLM)**, leading to **Softmax Collapse (SC)**. 
 
-To replicate the main figures from our paper, use the `run_main_experiments.sh` script. This script generates and logs all necessary metrics for the primary figures (Figures **1**, **2**, **4**, and **6**), and uses `cuda:0` by default. Once the relevant metrics have been saved, you can generate the figures from the paper using [paper_plots.ipynb](https://github.com/LucasPrietoAl/grokking-at-the-edge-of-numerical-stability/blob/main/paper_plots.ipynb).
+Our project introduces **Differential Privacy (DP)** as a novel information constraint to test a critical theoretical trade-off:
+1. **The Stabilizer (Cure):** Does DP's **Gradient Clipping** implicitly prevent the weight explosion that causes Softmax Collapse?
+2. **The Delay (Cost):** Does the **Gaussian Noise** injected by DP-SGD destroy the faint gradient signal required for the phase transition to generalization?
 
-### Usage
+## 🚀 Experimental Roadmap
+
+We replace traditional weight decay ($\lambda$) with a privacy budget ($\epsilon$) sweep:
+* **Baseline:** Replicating the "failure to grok" at $\lambda = 0$ (Softmax Collapse).
+* **Intervention:** Implementing DP-SGD via the `Opacus` library.
+* **Analysis:** A sweep over $\epsilon \in \{0.1, 0.5, 1.0, 5.0, 10.0\}$ to generate a **Phase Diagram** (Latency vs. Privacy).
+
+## 🛠️ Setup & Installation
+
+### 1. Environment Configuration
+We recommend using Python 3.10 and Conda for isolation:
 
 ```bash
-./run_main_experiments.sh [--figures FIGURE_LIST] [--device DEVICE]
-```
+# Create and activate environment
+conda create -n grokking-dp python=3.10 -y
+conda activate grokking-dp
 
-## Requirements :
-
-1. **Install PyTorch:**
-   
-   Visit the [PyTorch Get Started](https://pytorch.org/get-started/locally/) page to choose the appropriate installation command for your system.
-
-2. **Install Python Packages:**
-   Install the remaining dependencies using `pip`:
-   ```
-   pip install pandas==2.2.3
-   pip install matplotlib==3.10.0
-   ```
-
-## Citation
-
-If you found this code or paper useful, please consider citing:
-
-```shell
-@article{prieto2025grokking,
-  title={Grokking at the Edge of Numerical Stability},
-  author={Prieto, Lucas and Barsbey, Melih and Mediano, Pedro and Birdal, Tolga},
-  year = {2025},
-  eprint={2501.04697},
-  archivePrefix={arXiv},
-  primaryClass={cs.CV}
-}
-```
+# Install PyTorch with CUDA 12.1 support
+conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia
